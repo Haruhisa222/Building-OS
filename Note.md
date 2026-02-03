@@ -73,24 +73,38 @@
 #### まずは開発環境を整備
 1. Clang / NASM / iasl / python などを入れる
 2. LLVM7 を alternatives で clang にする（Ubuntu特有）
-
 3. EDK II を $HOME/edk2 に clone
-
 4. OS本用の クロスコンパイル済み標準ライブラリ一式
 (x86_64-elf/) をダウンロード
 
 👉 macOS では 2 は不要、1・3・4 を手でやる。⇩
 
-brew install nasm acpica python git して、
+- brew install nasm acpica pythonして、
 NASM        ✅<br>
 iasl        ✅ (acpica)<br>
 clang       ✅ Apple clang 17<br>
 python3     ✅<br>
 を確認
+- git clone https://github.com/tianocore/edk2.git<br>
+cd edk2<br>
+git submodule update --init --recursive<br>
+make -C BaseTools<br>
+source edksetup.sh<br>
+build -a X64 -t CLANGPDB -p OvmfPkg/OvmfPkgX64.dsc(build -a X64 -t CLANG -p OvmfPkg/OvmfPkgX64.dsc?)<br>
+->Build/OvmfX64/DEBUG_CLANGPDB/FV/OVMF.fdを確認<br>
+
+以下確認
+- brew install qemu
+- qemu-system-x86_64 --version
+- qemu-system-x86_64 \
+  -m 2G \
+  -bios Build/OvmfX64/DEBUG_CLANGPDB/FV/OVMF.fd
+- UEFI シェルが出たら成功。
 
 
 
 
 
-
-
+ダメそう...
+https://qiita.com/yamoridon/items/4905765cc6e4f320c9b5
+これそのままやってみよう
