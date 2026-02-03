@@ -69,7 +69,18 @@
     1.PC起動-> 2.BIOS起動 ->3.バイナリコード/ブートローダ等のBIOSアプリケーションを実行
     
 
-### 
+### C言語でhello,world
+#### まずは開発環境を整備
+1. Clang / NASM / iasl / python などを入れる
+2. LLVM7 を alternatives で clang にする（Ubuntu特有）
+
+3. EDK II を $HOME/edk2 に clone
+
+4. OS本用の クロスコンパイル済み標準ライブラリ一式
+(x86_64-elf/) をダウンロード
+
+👉 macOS では 2 は不要、1・3・4 を手でやる。⇩
+brew install nasm acpica python git
 
 
 
