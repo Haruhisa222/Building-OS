@@ -80,7 +80,13 @@
 (x86_64-elf/) をダウンロード
 
 👉 macOS では 2 は不要、1・3・4 を手でやる。⇩
-brew install nasm acpica python git
+
+brew install nasm acpica python git して、
+NASM        ✅<br>
+iasl        ✅ (acpica)<br>
+clang       ✅ Apple clang 17<br>
+python3     ✅<br>
+を確認
 
 
 
