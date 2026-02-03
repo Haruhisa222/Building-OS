@@ -11,7 +11,7 @@
 3. **人間に対するインタフェース**  
    各アプリに統一されたメニューを表示させる
 
-### インタフェースの種類
+### インタフェース
 - **POSIX**  
   UNIXで使われる。Cの処理やファイルシステム
 - **Windows API**  
@@ -22,6 +22,12 @@
 ---
 
 ## ブートローダ（第一章〜第三章）
+
+### ブートローダとは
+- 「OSをメインメモリに読み込み起動させるプログラム」のこと
+- CPUは 原則としてRAM(メインメモリ)上の命令しか実行できない。
+- 基本はOSがROM(ストレージ)にあるデータ,プログラムをRAMに渡している
+- PC起動時は例外で、PCは電源投入直後OSの存在すら知らないので、ROMに、OSをメインメモリに読み込み起動させるプログラム(ブートローダ)を入れておく必要がある
 
 ### hello, world するバイナリコードを書いてみる
 - バイナリコードにも、どのルールで書くか、がある
@@ -39,7 +45,35 @@
 3. **UEFI**  
    EFIを標準化し、現在広く採用されている
 
-###  
+###  hello, world するバイナリコードをUSBに書き込み、EFIで起動
+1. MACでUSBを初期化し起動時にEFIが呼ばれるようにした
+    sudo diskutil partitionDisk disk4 GPT MS-DOS UEFIUSB 100% 
+
+2. 起動するPCで、起動時にUSBが呼ばれるようにした
+    - FujitsuノートPCのBIOS画面でBoot->UEFI Priorities->Boot Option #1をELECOM MF...(コード入りUSB)に変更
+    - Security->Secure Boot->Disabledに変更
+- 補足
+    - レッツノートでもF2連打->BIOS画面で再起動 でいけた
+    - GPTに聞いたら別の場所にコードを保存していて動かなかったが、https://qiita.com/ktamido/items/56b3427827894021ed73 を参考にしてやれば動いた⇩
+            
+            mkdir -p ~/mnt/esp
+
+            sudo diskutil mount -mountPoint ~/mnt/esp /dev/disk4s1
+
+            mkdir -p ~/mnt/esp/EFI/BOOT
+            cp BOOTX64.EFI ~/mnt/esp/EFI/BOOT/BOOTX64.EFI
+
+            diskutil unmountDisk /dev/disk4
+- 起動順の整理
+
+    1.PC起動-> 2.BIOS起動 ->3.バイナリコード/ブートローダ等のBIOSアプリケーションを実行
+    
+
+### 
+
+
+
+
 
 
 
