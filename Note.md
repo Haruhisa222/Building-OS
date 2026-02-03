@@ -11,7 +11,7 @@
 3. **人間に対するインタフェース**  
    各アプリに統一されたメニューを表示させる
 
-### インタフェースの種類
+### インタフェース
 - **POSIX**  
   UNIXで使われる。Cの処理やファイルシステム
 - **Windows API**  
@@ -22,6 +22,12 @@
 ---
 
 ## ブートローダ（第一章〜第三章）
+
+### ブートローダとは
+- 「OSをメインメモリに読み込み起動させるプログラム」のこと
+- CPUは 原則としてRAM(メインメモリ)上の命令しか実行できない。
+- 基本はOSがROM(ストレージ)にあるデータ,プログラムをRAMに渡している
+- PC起動時は例外で、PCは電源投入直後OSの存在すら知らないので、ROMに、OSをメインメモリに読み込み起動させるプログラム(ブートローダ)を入れておく必要がある
 
 ### hello, world するバイナリコードを書いてみる
 - バイナリコードにも、どのルールで書くか、がある
@@ -39,7 +45,66 @@
 3. **UEFI**  
    EFIを標準化し、現在広く採用されている
 
-### 
+###  hello, world するバイナリコードをUSBに書き込み、EFIで起動
+1. MACでUSBを初期化し起動時にEFIが呼ばれるようにした
+    sudo diskutil partitionDisk disk4 GPT MS-DOS UEFIUSB 100% 
+
+2. 起動するPCで、起動時にUSBが呼ばれるようにした
+    - FujitsuノートPCのBIOS画面でBoot->UEFI Priorities->Boot Option #1をELECOM MF...(コード入りUSB)に変更
+    - Security->Secure Boot->Disabledに変更
+- 補足
+    - レッツノートでもF2連打->BIOS画面で再起動 でいけた
+    - GPTに聞いたら別の場所にコードを保存していて動かなかったが、https://qiita.com/ktamido/items/56b3427827894021ed73 を参考にしてやれば動いた⇩
+            
+            mkdir -p ~/mnt/esp
+
+            sudo diskutil mount -mountPoint ~/mnt/esp /dev/disk4s1
+
+            mkdir -p ~/mnt/esp/EFI/BOOT
+            cp BOOTX64.EFI ~/mnt/esp/EFI/BOOT/BOOTX64.EFI
+
+            diskutil unmountDisk /dev/disk4
+- 起動順の整理
+
+    1.PC起動-> 2.BIOS起動 ->3.バイナリコード/ブートローダ等のBIOSアプリケーションを実行
+    
+
+### C言語でhello,world
+#### まずは開発環境を整備
+1. Clang / NASM / iasl / python などを入れる
+2. LLVM7 を alternatives で clang にする（Ubuntu特有）
+3. EDK II を $HOME/edk2 に clone
+4. OS本用の クロスコンパイル済み標準ライブラリ一式
+(x86_64-elf/) をダウンロード
+
+👉 macOS では 2 は不要、1・3・4 を手でやる。⇩
+
+- brew install nasm acpica pythonして、
+NASM        ✅<br>
+iasl        ✅ (acpica)<br>
+clang       ✅ Apple clang 17<br>
+python3     ✅<br>
+を確認
+- git clone https://github.com/tianocore/edk2.git<br>
+cd edk2<br>
+git submodule update --init --recursive<br>
+make -C BaseTools<br>
+source edksetup.sh<br>
+build -a X64 -t CLANGPDB -p OvmfPkg/OvmfPkgX64.dsc(build -a X64 -t CLANG -p OvmfPkg/OvmfPkgX64.dsc?)<br>
+->Build/OvmfX64/DEBUG_CLANGPDB/FV/OVMF.fdを確認<br>
+
+以下確認
+- brew install qemu
+- qemu-system-x86_64 --version
+- qemu-system-x86_64 \
+  -m 2G \
+  -bios Build/OvmfX64/DEBUG_CLANGPDB/FV/OVMF.fd
+- UEFI シェルが出たら成功。
 
 
 
+
+
+ダメそう...
+https://qiita.com/yamoridon/items/4905765cc6e4f320c9b5
+これそのままやってみよう
