@@ -108,3 +108,6 @@ build -a X64 -t CLANGPDB -p OvmfPkg/OvmfPkgX64.dsc(build -a X64 -t CLANG -p Ovmf
 ダメそう...
 https://qiita.com/yamoridon/items/4905765cc6e4f320c9b5
 これそのままやってみよう
+->patch -p1 < mac.patchまでいけた(コード部分は、コピペボタンでコピーすると崩れてエラーするので選択してコピーしましょう)
+->HOMEに環境整備(osbook,sdk2)+workspace作成
+->QemuでHello,World成功
